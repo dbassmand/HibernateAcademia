@@ -57,7 +57,6 @@ public class Principal {
             } else {
                 bandera = true;
             }
-
             // Reinicia la bandera para seguir dentro del bucle
             bandera = false;
 
