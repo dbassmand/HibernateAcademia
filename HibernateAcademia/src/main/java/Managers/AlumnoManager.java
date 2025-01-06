@@ -112,5 +112,13 @@ public class AlumnoManager {
 	    return (maxId != null) ? maxId : 0;  // Operador ternario: si maxId es null, devuelve 0
 	}
 
+	public boolean exists(long id) {
+	    Session session = ManagerPrincipal.sessionFactory.openSession();
+	    Alumno alumno = session.get(Alumno.class, id); // Intentamos obtener el registro
+	    session.close();
+	    return alumno != null; // Si alumno es null, significa que no existe
+	}
+
+
 	
 }

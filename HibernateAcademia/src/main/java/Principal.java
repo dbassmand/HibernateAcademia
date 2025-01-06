@@ -84,7 +84,7 @@ public class Principal {
                     // Bucle para validar el apellido del alumno
                     bandera = false;
                     while (!bandera) {
-                        System.out.println("Apellido del alumno: ");
+                        System.out.print("Apellido del alumno: ");
                         apellido = entrada.nextLine().trim();
                         
                         if (apellido.isEmpty()) {
@@ -95,7 +95,7 @@ public class Principal {
                     }
 
                     // Leer la edad del alumno
-                    System.out.println("Edad del alumno:");
+                    System.out.print("Edad del alumno:");
                     while (!entrada.hasNextInt()) {
                         System.out.println("Por favor introduzca un número válido");
                         entrada.next(); // Limpiar el scanner
@@ -104,7 +104,7 @@ public class Principal {
                     entrada.nextLine(); // Limpiar el scanner
                     
                     // Leer el número de asignaturas
-                    System.out.println("Numero de asignaturas: ");
+                    System.out.print("Numero de asignaturas: ");
                     while (!entrada.hasNextInt()) {
                         System.out.println("Por favor introduzca un número válido");
                         entrada.next(); // Limpiar el scanner
@@ -127,6 +127,11 @@ public class Principal {
                     // Obtener el ID máximo de la base de datos
                     maxId = alumnomanager.getmaxId();
                     
+                    if (maxId == 0) { //opcion muy improbable, pero comprueba que haya al menos 1 registro en la BBDD
+                        System.out.println("No hay registros disponibles en la base de datos.");
+                        break;
+                    }
+                    
                     // Mostrar el rango de IDs válidos
                     System.out.println("\nEl rango de Id´s válidos es desde 1 a " + maxId);
                     System.out.print("Introduzca el ID del registro que desea consultar: ");
@@ -144,8 +149,10 @@ public class Principal {
                     // Validar que el ID esté dentro del rango permitido
                     if (idGenerado < 1 || idGenerado > maxId) {
                         System.out.println("El Id introducido no existe");
-                    } else {
-                        // Si el ID es válido, se leen los datos del alumno
+                    } else if(!alumnomanager.exists(idGenerado)) { //verifica que el si ID esta vacia por que fue borrado 
+                        System.out.println("\nRegistro vacío: No existe un registro asociado con este ID.");
+                    }else {
+                        // Si el ID es válido, esta en rango y contiene datos, se leen los datos del alumno
                         alumnomanager.read(idGenerado);
                         alumnomanager.info(idGenerado);
                     }
@@ -176,59 +183,67 @@ public class Principal {
                     idGenerado = entrada.nextLong();
                     entrada.nextLine(); // Limpiar el scanner
                     
-                    // Bucle para validar el nombre del alumno
-                    while (!bandera) {
-                        System.out.print("\nNombre del alumno: ");
-                        nombre = entrada.nextLine().trim(); // Elimina espacios en blanco
-                         
-                        if (nombre.isEmpty()) {
-                            System.out.println("El nombre no puede estar vacio, intentelo de nuevo");
-                        } else {                    
-                            bandera = true;
+                    // Validar que el ID esté dentro del rango permitido
+                    if (idGenerado < 1 || idGenerado > maxId) {
+                        System.out.println("El Id introducido no existe");
+                    } else if (!alumnomanager.exists(idGenerado)) {  // Verifica si el registro existe
+                        System.out.println("\n**ATENCION** Registro vacío: ese registro no puede ser utilizado, ya fue borrado!");
+                        break;  // Esto hace que el flujo regrese al menú sin intentar modificar el registro
+                    } else {
+                        // Si el ID es válido y existe, procedemos con la modificación
+                        // Bucle para validar el nombre del alumno
+                        while (!bandera) {
+                            System.out.print("\nNombre del alumno: ");
+                            nombre = entrada.nextLine().trim(); // Elimina espacios en blanco
+                             
+                            if (nombre.isEmpty()) {
+                                System.out.println("El nombre no puede estar vacío, intentelo de nuevo");
+                            } else {                    
+                                bandera = true;
+                            }
                         }
-                    }
-                    
-                    // Bucle para validar el apellido del alumno
-                    bandera = false;
-                    while (!bandera) {
-                        System.out.print("Apellido del alumno: ");
-                        apellido = entrada.nextLine().trim();
                         
-                        if (apellido.isEmpty()) {
-                            System.out.println("El apellido no puede estar vacio, intentelo de nuevo");
-                        } else {
-                            bandera = true;
+                        // Bucle para validar el apellido del alumno
+                        bandera = false;
+                        while (!bandera) {
+                            System.out.print("Apellido del alumno: ");
+                            apellido = entrada.nextLine().trim();
+                            
+                            if (apellido.isEmpty()) {
+                                System.out.println("El apellido no puede estar vacío, intentelo de nuevo");
+                            } else {
+                                // Leer la edad del alumno
+                                System.out.print("Edad del alumno:");
+                                while (!entrada.hasNextInt()) {
+                                    System.out.println("Por favor introduzca un número válido");
+                                    entrada.next(); // Limpiar el scanner
+                                }
+                                edad = entrada.nextInt();
+                                entrada.nextLine(); // Limpiar el scanner
+                                
+                                // Leer el número de asignaturas
+                                System.out.print("Número de asignaturas: ");
+                                while (!entrada.hasNextInt()) {
+                                    System.out.println("Por favor introduzca un número válido");
+                                    entrada.next(); // Limpiar el scanner
+                                }
+                                numeroasignaturas = entrada.nextInt();
+                                entrada.nextLine(); // Limpiar el scanner
+                                
+                                // Llamar al método update de AlumnoManager para actualizar los datos del alumno
+                                alumnomanager.update(idGenerado, nombre, apellido, edad, numeroasignaturas);
+                                
+                                // Mostrar los nuevos datos del alumno
+                                System.out.println("\nLos datos del alumno modificado son");
+                                alumnomanager.info(idGenerado);
+                                
+                                // Reiniciar bandera para volver al menú principal
+                                bandera = false;
+                            }
                         }
                     }
-
-                    // Leer la edad del alumno
-                    System.out.print("Edad del alumno:");
-                    while (!entrada.hasNextInt()) {
-                        System.out.println("Por favor introduzca un número válido");
-                        entrada.next(); // Limpiar el scanner
-                    }
-                    edad = entrada.nextInt();
-                    entrada.nextLine(); // Limpiar el scanner
-                    
-                    // Leer el número de asignaturas
-                    System.out.print("Numero de asignaturas: ");
-                    while (!entrada.hasNextInt()) {
-                        System.out.println("Por favor introduzca un número válido");
-                        entrada.next(); // Limpiar el scanner
-                    }
-                    numeroasignaturas = entrada.nextInt();
-                    entrada.nextLine(); // Limpiar el scanner
-                    
-                    // Llamar al método update de AlumnoManager para actualizar los datos del alumno
-                    alumnomanager.update(idGenerado, nombre, apellido, edad, numeroasignaturas);
-                    
-                    // Mostrar los nuevos datos del alumno
-                    System.out.println("\nLos datos del alumno modificado son");
-                    alumnomanager.info(idGenerado);
-                    
-                    // Reiniciar bandera para volver al menú principal
-                    bandera = false;
                     break;
+
                 
                 case 4:
                     // Opción para eliminar un registro
@@ -269,7 +284,7 @@ public class Principal {
                             if (respuesta.equals("s")) {
                                 // Eliminar el registro
                                 alumnomanager.delete(idGenerado);  
-                                System.out.println("Registro eliminado");
+                                System.out.println("Registro " + idGenerado + " eliminado correctamente!.");
                                 bandera = true;
                             } else if (respuesta.equals("n")) {
                                 System.out.println("Registro no eliminado");
