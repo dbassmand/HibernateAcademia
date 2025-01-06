@@ -19,6 +19,7 @@ public class Principal {
         int numeroasignaturas = 0;
         long maxId = 0;
         boolean bandera = false;
+        boolean banderaMenu = false;
         String respuesta = "";
 
         // Mensaje de bienvenida
@@ -31,7 +32,7 @@ public class Principal {
         AlumnoManager alumnomanager = new AlumnoManager();
         
         // Bucle principal que mantiene el programa activo hasta que se salga
-        while (!bandera) {
+        while (!banderaMenu) {
 
             // Imprimir el menú de opciones
             System.out.println("\n************************************");
@@ -117,7 +118,7 @@ public class Principal {
                     System.out.println("Registro creado con éxito. El ID del nuevo registro es: " + idGenerado);
                     
                     // Reiniciar bandera para volver al menú principal
-                    bandera = false;
+                    banderaMenu = false;
                     break;
                 
                 case 2:
@@ -158,93 +159,105 @@ public class Principal {
                     }
                     
                     // Reiniciar bandera para volver al menú principal
-                    bandera = false;
+                    banderaMenu = false;
                     break;
                 
                 case 3:
                     // Opción para modificar un registro
-                    System.out.println("\n**Modificar Registro**");
+                    System.out.println("\n***Modificar Registro***");
                     bandera = false; // Reiniciar bandera
-                    
+                    banderaMenu = false; // Reiniciar banderaMenu (esto debería ser true después de la modificación)
+
                     // Obtener el ID máximo de la base de datos
                     maxId = alumnomanager.getmaxId();
-                    
+
                     // Mostrar el rango de IDs válidos
                     System.out.println("\nEl rango de Id´s válidos es desde 1 a " + maxId);
                     System.out.print("Introduzca el ID del registro que desea modificar: ");
-                    
+
                     // Validación para asegurar que se ingrese un ID válido
                     while (!entrada.hasNextLong()) {
                         System.out.println("Por favor, introduzca un valor válido");
                         entrada.next();
                     }
-                    
+
                     // Leer el ID del registro
                     idGenerado = entrada.nextLong();
                     entrada.nextLine(); // Limpiar el scanner
-                    
+
                     // Validar que el ID esté dentro del rango permitido
                     if (idGenerado < 1 || idGenerado > maxId) {
                         System.out.println("El Id introducido no existe");
                     } else if (!alumnomanager.exists(idGenerado)) {  // Verifica si el registro existe
                         System.out.println("\n**ATENCION** Registro vacío: ese registro no puede ser utilizado, ya fue borrado!");
-                        break;  // Esto hace que el flujo regrese al menú sin intentar modificar el registro
                     } else {
                         // Si el ID es válido y existe, procedemos con la modificación
+                        // Bucle para validar el nombre del alumno
+
+                        System.out.println("Los datos del alumno que vas a modificar son:");
+                        alumnomanager.info(idGenerado);
+
                         // Bucle para validar el nombre del alumno
                         while (!bandera) {
                             System.out.print("\nNombre del alumno: ");
                             nombre = entrada.nextLine().trim(); // Elimina espacios en blanco
-                             
+
                             if (nombre.isEmpty()) {
                                 System.out.println("El nombre no puede estar vacío, intentelo de nuevo");
-                            } else {                    
+                            } else {
                                 bandera = true;
                             }
                         }
-                        
+
                         // Bucle para validar el apellido del alumno
                         bandera = false;
                         while (!bandera) {
                             System.out.print("Apellido del alumno: ");
                             apellido = entrada.nextLine().trim();
-                            
+
                             if (apellido.isEmpty()) {
                                 System.out.println("El apellido no puede estar vacío, intentelo de nuevo");
                             } else {
-                                // Leer la edad del alumno
-                                System.out.print("Edad del alumno:");
-                                while (!entrada.hasNextInt()) {
-                                    System.out.println("Por favor introduzca un número válido");
-                                    entrada.next(); // Limpiar el scanner
-                                }
-                                edad = entrada.nextInt();
-                                entrada.nextLine(); // Limpiar el scanner
-                                
-                                // Leer el número de asignaturas
-                                System.out.print("Número de asignaturas: ");
-                                while (!entrada.hasNextInt()) {
-                                    System.out.println("Por favor introduzca un número válido");
-                                    entrada.next(); // Limpiar el scanner
-                                }
-                                numeroasignaturas = entrada.nextInt();
-                                entrada.nextLine(); // Limpiar el scanner
-                                
-                                // Llamar al método update de AlumnoManager para actualizar los datos del alumno
-                                alumnomanager.update(idGenerado, nombre, apellido, edad, numeroasignaturas);
-                                
-                                // Mostrar los nuevos datos del alumno
-                                System.out.println("\nLos datos del alumno modificado son");
-                                alumnomanager.info(idGenerado);
-                                
-                                // Reiniciar bandera para volver al menú principal
-                                bandera = false;
+                                bandera = true;
                             }
                         }
+
+                        // Leer la edad del alumno
+                        System.out.print("Edad del alumno:");
+                        while (!entrada.hasNextInt()) {
+                            System.out.println("Por favor introduzca un número válido");
+                            entrada.next(); // Limpiar el scanner                           
+                        }
+                        edad = entrada.nextInt();
+                        entrada.nextLine(); // Limpiar el scanner
+
+                        // Leer el número de asignaturas
+                        System.out.print("Número de asignaturas: ");
+                        while (!entrada.hasNextInt()) {
+                            System.out.println("Por favor introduzca un número válido");
+                            entrada.next(); // Limpiar el scanner                                                        
+                        }
+                        numeroasignaturas = entrada.nextInt();
+                        entrada.nextLine(); // Limpiar el scanner
+                        
+
+                        // Llamar al método update de AlumnoManager para actualizar los datos del alumno
+                        alumnomanager.update(idGenerado, nombre, apellido, edad, numeroasignaturas);
+
+                        // Mostrar los nuevos datos del alumno
+                        System.out.println("\nLos datos del alumno modificados son:");
+                        alumnomanager.info(idGenerado);
+
+                        // Una vez que la actualización haya sido completada, volver al menú
+                        System.out.println("\nLos cambios fueron realizados correctamente.");
+
+                        
                     }
+                    // Establecer la bandera para volver al menú principal
+                    banderaMenu = false;  // Esto indica que debemos salir del bucle y volver al menú
                     break;
 
-                
+               
                 case 4:
                     // Opción para eliminar un registro
                     System.out.println("\n**Eliminar registro**");
@@ -295,7 +308,7 @@ public class Principal {
                         }
                     }
                     // Reiniciar bandera para volver al menú principal
-                    bandera = false;
+                    banderaMenu = false;
                     break;
 
                 case 5:
@@ -305,7 +318,7 @@ public class Principal {
                     }
                     
                     System.out.println("\nHasta pronto!...");  // Despedida
-                    bandera = true;  // Salir del bucle principal
+                    banderaMenu = true;  // Salir del bucle principal
                     
                     break;
 
@@ -315,7 +328,6 @@ public class Principal {
         }
     }
 }
-
 
 
 
